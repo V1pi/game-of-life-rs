@@ -1,3 +1,5 @@
+pub mod grid_math;
+
 #[cfg(test)]
 mod tests {
     #[test]
