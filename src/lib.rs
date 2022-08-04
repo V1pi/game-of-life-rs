@@ -1,3 +1,4 @@
+pub mod game;
 pub mod grid_math;
 
 #[cfg(test)]
