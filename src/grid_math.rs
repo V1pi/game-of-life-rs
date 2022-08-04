@@ -29,6 +29,38 @@ impl GridMath {
         }
         merged
     }
+
+    pub fn get_based_on_relative_position(
+        &self,
+        grid: &Vec<u32>,
+        row: i32,
+        col: i32,
+        absolute_row: i32,
+        absolute_col: i32,
+    ) -> Result<u32, &'static str> {
+        let new_row_int = row + absolute_row;
+        let new_col_int = col + absolute_col;
+
+        let new_row = match new_row_int.try_into() {
+            Ok(new_row) => new_row,
+            Err(_) => return Err("Row out of bounds"),
+        };
+
+        let new_col = match new_col_int.try_into() {
+            Ok(new_col) => new_col,
+            Err(_) => return Err("Col out of bounds"),
+        };
+
+        if new_row >= self.rows {
+            return Err("Row out of bounds");
+        }
+
+        if new_col >= self.cols {
+            return Err("Col out of bounds");
+        }
+
+        Ok(self.get(grid, new_row, new_col))
+    }
 }
 
 #[cfg(test)]
@@ -55,6 +87,31 @@ mod grid_tests {
         let grid = vec![0, 0, 0, 0, 1, 0, 0, 0, 0];
         let grid_math = GridMath { rows: 3, cols: 3 };
         assert_eq!(grid_math.get(&grid, 1, 1), 1);
+    }
+
+    #[test]
+    fn get_based_relative_position() {
+        let grid = vec![0, 0, 0, 0, 1, 0, 0, 2, 1];
+        let grid_math = GridMath { rows: 3, cols: 3 };
+        assert_eq!(
+            grid_math.get_based_on_relative_position(&grid, 1, 1, 0, 0),
+            Ok(1)
+        );
+
+        assert_eq!(
+            grid_math.get_based_on_relative_position(&grid, 1, 1, 1, 1),
+            Ok(1)
+        );
+
+        assert_eq!(
+            grid_math.get_based_on_relative_position(&grid, 1, 1, 2, 2),
+            Err("Row out of bounds")
+        );
+
+        assert_eq!(
+            grid_math.get_based_on_relative_position(&grid, 1, 1, 1, 0),
+            Ok(2)
+        );
     }
 
     #[test]
