@@ -25,6 +25,54 @@ impl Game {
         }
     }
 
+    async fn perform_step(&self, grid: &Vec<u32>) -> Vec<u32> {
+        let mut new_grid = grid.clone();
+        let directions = vec![
+            (0, 1),
+            (-1, 1),
+            (-1, -1),
+            (1, -1),
+            (-1, -1),
+            (1, 0),
+            (0, -1),
+            (-1, 0),
+        ];
+
+        for (index, _) in grid.iter().enumerate() {
+            let (row, col) = self.grid_math.get_pos_from_index(index);
+            let mut sum = 0;
+            for (absolute_row, absolute_col) in directions.iter() {
+                match self.grid_math.get_based_on_relative_position(
+                    grid,
+                    row as i32,
+                    col as i32,
+                    *absolute_row,
+                    *absolute_col,
+                ) {
+                    Ok(value) => sum += value,
+                    Err(_) => continue,
+                }
+            }
+            if sum >= 2 {
+                new_grid[index] = 1;
+            } else if sum < 2 {
+                new_grid[index] = 0;
+            }
+        }
+
+        new_grid
+    }
+
+    pub async fn step(&mut self) {
+        if matches!(self.state, GameState::RUNNING) {
+            return;
+        }
+
+        self.state = GameState::RUNNING;
+        self.grid = self.perform_step(&self.grid).await;
+        self.state = GameState::IDLE;
+    }
+
     pub fn get_grid(&self) -> &Vec<u32> {
         &self.grid
     }
