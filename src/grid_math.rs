@@ -16,6 +16,10 @@ impl GridMath {
         grid[(row * self.cols + col) as usize]
     }
 
+    pub fn get_pos_from_index(&self, index: usize) -> (usize, usize) {
+        (index / self.cols as usize, index % self.cols as usize)
+    }
+
     pub fn merge_grids(&self, original: &Vec<u32>, grids: &Vec<Vec<u32>>) -> Vec<u32> {
         let mut merged = original.clone();
         for (index, value) in original.iter().enumerate() {
@@ -112,6 +116,12 @@ mod grid_tests {
             grid_math.get_based_on_relative_position(&grid, 1, 1, 1, 0),
             Ok(2)
         );
+    }
+
+    #[test]
+    fn get_pos_from_index() {
+        let grid_math = GridMath { rows: 3, cols: 3 };
+        assert_eq!(grid_math.get_pos_from_index(4), (1, 1));
     }
 
     #[test]
