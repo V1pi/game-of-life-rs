@@ -92,6 +92,7 @@ impl Game {
 #[cfg(test)]
 mod game_tests {
     use crate::game::{Game, GameState};
+    use futures::executor::block_on;
 
     #[test]
     fn new_game() {
@@ -105,6 +106,16 @@ mod game_tests {
     fn add_draw() {
         let mut game = Game::new(3, 3);
         game.add_draw(0, 0, 1);
+        assert_eq!(game.grid[0], 1);
+    }
+
+    #[test]
+    fn step() {
+        let mut game = Game::new(3, 3);
+        game.add_draw(0, 0, 1);
+        game.add_draw(0, 1, 1);
+        game.add_draw(1, 0, 1);
+        block_on(game.step());
         assert_eq!(game.grid[0], 1);
     }
 
